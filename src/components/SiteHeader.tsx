@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { NavItem } from "@/shared/types";
+import { BrandIcon } from "@/shared/render/BrandIcon";
 
-export function SiteHeader({ name, logo, logoLight, nav, events }: { name: string; logo?: string; logoLight?: string; nav: NavItem[]; events: { slug: string; title: string }[] }) {
+export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; events: { slug: string; title: string }[] }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [drop, setDrop] = useState(false);
@@ -30,7 +31,9 @@ export function SiteHeader({ name, logo, logoLight, nav, events }: { name: strin
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoSrc} alt={name} className="h-10 w-auto" />
           ) : (
-            <span className="fp-heading text-xl">✿ {name}</span>
+            <span className="fp-heading flex items-center gap-2 text-xl">
+              <BrandIcon url={icon} className="h-8" /> {name}
+            </span>
           )}
         </a>
         <nav className="hidden items-center gap-1 md:flex">

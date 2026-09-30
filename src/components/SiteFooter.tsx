@@ -1,4 +1,5 @@
 import type { SiteSettings } from "@/shared/types";
+import { BrandIcon } from "@/shared/render/BrandIcon";
 
 const SOCIAL: [keyof SiteSettings["social"], string][] = [
   ["instagram", "Instagram"],
@@ -18,7 +19,9 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={s.brand.logo_light_url || s.brand.logo_url} alt={s.festival_name} className="h-12 w-auto self-start" />
           ) : (
-            <span className="fp-heading text-2xl">✿ {s.festival_name}</span>
+            <span className="fp-heading flex items-center gap-2 text-2xl">
+              <BrandIcon url={s.brand.icon_url} className="h-10" /> {s.festival_name}
+            </span>
           )}
           {s.footer.text && <p className="opacity-85">{s.footer.text}</p>}
         </div>

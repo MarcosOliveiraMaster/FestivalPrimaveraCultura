@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getEvents, getSettings } from "@/lib/data";
 import { EventCard } from "@/shared/render/BlockView";
 import { Tracker } from "@/components/Tracker";
+import { BrandIcon } from "@/shared/render/BrandIcon";
 
 export const metadata: Metadata = { title: "Eventos" };
 
@@ -31,11 +32,14 @@ export default async function EventsPage({ searchParams }: PageProps<"/eventos">
           </div>
         )}
         {list.length === 0 ? (
-          <p className="py-16 text-center text-lg opacity-70">A programação será divulgada em breve. 🌸</p>
+          <div className="flex flex-col items-center gap-4 py-16 text-center text-lg opacity-70">
+            <BrandIcon url={s.brand.icon_url} className="h-14" />
+            <p>A programação será divulgada em breve.</p>
+          </div>
         ) : (
           <div className="grid gap-6 @xl:grid-cols-2 @4xl:grid-cols-3">
             {list.map((e) => (
-              <EventCard key={e.id} e={e} fallback={s.brand.event_cover_url} />
+              <EventCard key={e.id} e={e} fallback={s.brand.event_cover_url} icon={s.brand.icon_url} />
             ))}
           </div>
         )}
