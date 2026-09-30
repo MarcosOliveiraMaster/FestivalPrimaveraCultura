@@ -4,12 +4,13 @@ import { getEvents, getPageBySlug, getSettings } from "@/lib/data";
 import { PageRenderer } from "@/shared/render/PageRenderer";
 import { Tracker } from "@/components/Tracker";
 import { currentTime, formatRange } from "@/shared/format";
+import { cleanSrc } from "@/shared/image";
 
 export async function generateMetadata({ params }: PageProps<"/eventos/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const [page, s] = await Promise.all([getPageBySlug(slug), getSettings()]);
   if (!page) return {};
-  const image = page.seo?.image || page.cover_url || s.brand.og_image_url;
+  const image = cleanSrc(page.seo?.image || page.cover_url || s.brand.og_image_url);
   return {
     title: page.seo?.title || page.title,
     description: page.seo?.description || [formatRange(page.starts_at, page.ends_at), page.location].filter(Boolean).join(" · ") || undefined,

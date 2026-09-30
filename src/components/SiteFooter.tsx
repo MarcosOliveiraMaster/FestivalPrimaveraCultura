@@ -1,5 +1,6 @@
 import type { SiteSettings } from "@/shared/types";
 import { BrandIcon } from "@/shared/render/BrandIcon";
+import { FramedImage } from "@/shared/render/FramedImage";
 
 const SOCIAL: [keyof SiteSettings["social"], string][] = [
   ["instagram", "Instagram"],
@@ -16,8 +17,9 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3 md:px-8">
         <div className="flex flex-col gap-3">
           {s.brand.logo_light_url || s.brand.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={s.brand.logo_light_url || s.brand.logo_url} alt={s.festival_name} className="h-12 w-auto self-start" />
+            <span className="inline-flex h-12 self-start overflow-hidden">
+              <FramedImage url={s.brand.logo_light_url || s.brand.logo_url} alt={s.festival_name} className="h-full w-auto max-w-none object-contain" />
+            </span>
           ) : (
             <span className="fp-heading flex items-center gap-2 text-2xl">
               <BrandIcon url={s.brand.icon_url} className="h-10" /> {s.festival_name}

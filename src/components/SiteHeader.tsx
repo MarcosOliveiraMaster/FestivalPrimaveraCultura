@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { NavItem } from "@/shared/types";
 import { BrandIcon } from "@/shared/render/BrandIcon";
+import { FramedImage } from "@/shared/render/FramedImage";
 
 export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; events: { slug: string; title: string }[] }) {
   const [open, setOpen] = useState(false);
@@ -28,8 +29,9 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name:
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:px-8">
         <a href="/" className="flex items-center gap-2" aria-label={name}>
           {logoSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt={name} className="h-10 w-auto" />
+            <span className="inline-flex h-10 overflow-hidden">
+              <FramedImage url={logoSrc} alt={name} loading="eager" className="h-full w-auto max-w-none object-contain" />
+            </span>
           ) : (
             <span className="fp-heading flex items-center gap-2 text-xl">
               <BrandIcon url={icon} className="h-8" /> {name}

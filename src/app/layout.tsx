@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { getNavEvents, getSettings } from "@/lib/data";
 import { googleFontsHref, themeCss } from "@/shared/theme";
+import { cleanSrc } from "@/shared/image";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -9,11 +10,12 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
+  const favicon = cleanSrc(s.brand.favicon_url || s.brand.icon_url);
   return {
     title: { default: s.festival_name, template: `%s · ${s.festival_name}` },
     description: s.tagline ?? "Música, arte e cultura para celebrar a primavera.",
-    icons: s.brand.favicon_url || s.brand.icon_url ? { icon: (s.brand.favicon_url || s.brand.icon_url)!, apple: (s.brand.favicon_url || s.brand.icon_url)! } : undefined,
-    openGraph: { siteName: s.festival_name, images: s.brand.og_image_url ? [s.brand.og_image_url] : undefined, locale: "pt_BR", type: "website" },
+    icons: favicon ? { icon: favicon, apple: favicon } : undefined,
+    openGraph: { siteName: s.festival_name, images: s.brand.og_image_url ? [cleanSrc(s.brand.og_image_url)] : undefined, locale: "pt_BR", type: "website" },
   };
 }
 
