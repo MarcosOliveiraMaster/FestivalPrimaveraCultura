@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "../shared/festival.css";
+
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { background: var(--fp-bg); color: var(--fp-text); font-family: var(--fp-font-body); }
+
+/* Espaço para o cabeçalho fixo, exceto quando a página começa com uma capa escura */
+main { padding-top: 4rem; }
+main:has(> .fp-page > section:first-child.fp-on-dark) { padding-top: 0; }
