@@ -10,6 +10,8 @@ const SOCIAL: [keyof SiteSettings["social"], string][] = [
   ["whatsapp", "WhatsApp"],
 ];
 
+const OXE_PROVISORIO = "https://LinkCanalOxe.com.br";
+
 export function SiteFooter({ s }: { s: SiteSettings }) {
   const social = SOCIAL.filter(([k]) => s.social[k]);
   return (
@@ -36,15 +38,15 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
         </div>
         <div className="flex flex-col gap-1">
           <span className="fp-label !text-white/70">Redes</span>
-          {social.length ? (
-            social.map(([k, label]) => (
-              <a key={k} href={s.social[k]} target="_blank" rel="noopener noreferrer" data-track={`social:${k}`} className="hover:underline">
-                {label}
-              </a>
-            ))
-          ) : (
-            <span className="opacity-90">Em breve</span>
-          )}
+          {social.map(([k, label]) => (
+            <a key={k} href={s.social[k]} target="_blank" rel="noopener noreferrer" data-track={`social:${k}`} className="hover:underline">
+              {label}
+            </a>
+          ))}
+          {/* Canal da OXE: link definido em Configurações → Redes (provisório até o link oficial). */}
+          <a href={s.social.oxe || OXE_PROVISORIO} target="_blank" rel="noopener noreferrer" data-track="social:oxe" className="mt-2 inline-flex items-center gap-2 self-start rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[var(--fp-primary)] hover:opacity-90">
+            ▶ Canal da OXE <span className="font-normal opacity-75">{(s.social.oxe || OXE_PROVISORIO).replace(/^https?:\/\/(www\.)?/i, "").replace(/\/$/, "")}</span>
+          </a>
         </div>
       </div>
       <div className="border-t border-white/15">
