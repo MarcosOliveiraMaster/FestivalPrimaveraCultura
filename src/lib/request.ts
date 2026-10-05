@@ -25,3 +25,8 @@ export function str(v: unknown, max: number) {
   const s = v.trim().slice(0, max);
   return s || null;
 }
+
+/** Só aceita caminhos internos (evita redirecionamento para outros sites). */
+export function safeNext(next: string | null | undefined) {
+  return next && /^\/(?!\/)[\w\-./?=&%#]*$/.test(next) ? next : "/minha-conta";
+}

@@ -4,7 +4,7 @@ import type { NavItem } from "@/shared/types";
 import { BrandIcon } from "@/shared/render/BrandIcon";
 import { FramedImage } from "@/shared/render/FramedImage";
 
-export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; events: { slug: string; title: string }[] }) {
+export function SiteHeader({ name, logo, logoLight, icon, nav, events, account }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; events: { slug: string; title: string }[]; account?: string | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [drop, setDrop] = useState(false);
@@ -64,6 +64,9 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name:
               </a>
             ),
           )}
+          <a href={account ? "/minha-conta" : "/entrar"} data-track="menu:conta" className={`ml-2 rounded-full px-4 py-2 font-semibold ${solid ? "bg-[var(--fp-primary)] text-white" : "bg-white/15 ring-1 ring-white/40"}`}>
+            {account ? `Olá, ${account}` : "Entrar"}
+          </a>
         </nav>
         <button type="button" className="md:hidden" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -84,6 +87,9 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events }: { name:
                 ))}
             </div>
           ))}
+          <a href={account ? "/minha-conta" : "/entrar"} onClick={() => setOpen(false)} className="mt-2 block py-3 text-lg font-semibold text-[var(--fp-primary)]">
+            {account ? "Minha conta" : "Entrar / criar conta"}
+          </a>
         </nav>
       )}
     </header>

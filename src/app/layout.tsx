@@ -5,6 +5,7 @@ import { googleFontsHref, themeCss } from "@/shared/theme";
 import { cleanSrc } from "@/shared/image";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { getViewer } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [s, navEvents] = await Promise.all([getSettings(), getNavEvents()]);
+  const [s, navEvents, viewer] = await Promise.all([getSettings(), getNavEvents(), getViewer()]);
   const fonts = googleFontsHref(s.theme);
   return (
     <html lang="pt-BR">
@@ -35,7 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <style dangerouslySetInnerHTML={{ __html: themeCss(s.theme) }} />
       </head>
       <body className="min-h-screen antialiased">
-        <SiteHeader name={s.festival_name} logo={s.brand.logo_url} logoLight={s.brand.logo_light_url} icon={s.brand.icon_url} nav={s.nav} events={navEvents} />
+        <SiteHeader name={s.festival_name} logo={s.brand.logo_url} logoLight={s.brand.logo_light_url} icon={s.brand.icon_url} nav={s.nav} events={navEvents} account={viewer.user ? viewer.user.name.split(" ")[0] : null} />
         <main>{children}</main>
         <SiteFooter s={s} />
       </body>

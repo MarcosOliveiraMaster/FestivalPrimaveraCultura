@@ -5,6 +5,7 @@ import { PageRenderer } from "@/shared/render/PageRenderer";
 import { Tracker } from "@/components/Tracker";
 import { currentTime, formatRange } from "@/shared/format";
 import { cleanSrc } from "@/shared/image";
+import { getViewer } from "@/lib/supabase-server";
 
 export async function generateMetadata({ params }: PageProps<"/eventos/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/eventos/[slug]">)
 
 export default async function EventPage({ params }: PageProps<"/eventos/[slug]">) {
   const { slug } = await params;
-  const [page, settings, events] = await Promise.all([getPageBySlug(slug), getSettings(), getEvents()]);
+  const [page, settings, events, viewer] = await Promise.all([getPageBySlug(slug), getSettings(), getEvents(), getViewer()]);
   if (!page) notFound();
   return (
     <>
@@ -32,7 +33,7 @@ export default async function EventPage({ params }: PageProps<"/eventos/[slug]">
       ) : (
         <PageRenderer
           content={page.content}
-          ctx={{ mode: "public", pageId: page.id, settings, events, now: currentTime(), page: { title: page.title, starts_at: page.starts_at, ends_at: page.ends_at, location: page.location } }}
+          ctx={{ mode: "public", pageId: page.id, settings, events, now: currentTime(), viewer: { loggedIn: !!viewer.user }, page: { title: page.title, starts_at: page.starts_at, ends_at: page.ends_at, location: page.location, color: page.color } }}
         />
       )}
       <Tracker pageId={page.id} />

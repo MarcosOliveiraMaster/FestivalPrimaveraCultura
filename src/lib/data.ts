@@ -40,10 +40,12 @@ export interface PublicPage {
   location: string | null;
   cover_url: string | null;
   seo: { title?: string; description?: string; image?: string };
+  /** Cor própria da página (substitui a cor principal do tema). */
+  color: string | null;
   content: PageContent;
 }
 
-const FIELDS = "id, kind, slug, title, category, starts_at, ends_at, location, cover_url, seo, content";
+const FIELDS = "id, kind, slug, title, category, starts_at, ends_at, location, cover_url, seo, color, content";
 
 export const getHome = cache(async (): Promise<PublicPage | null> => {
   const { data } = await supabase().from("pages").select(FIELDS).eq("kind", "home").maybeSingle();
