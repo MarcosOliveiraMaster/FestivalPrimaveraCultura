@@ -2,36 +2,43 @@ import { cache } from "react";
 import { supabase } from "./supabase";
 import { mergeSettings } from "@/shared/theme";
 import { normalizeContent } from "@/shared/blocks";
-import type { EventSummary, PageContent, SiteSettings } from "@/shared/types";
+import type { AreaKind, EventSummary, PageContent, PageKind, SiteSettings } from "@/shared/types";
+import { AREA_KINDS, AREAS } from "@/shared/areas";
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   const { data } = await supabase().from("site_settings").select("*").eq("id", 1).maybeSingle();
   return mergeSettings(data);
 });
 
-export const getEvents = cache(async (): Promise<EventSummary[]> => {
+export const getEvents = cache(async (kind: AreaKind = "evento"): Promise<EventSummary[]> => {
   const { data } = await supabase()
     .from("pages")
-    .select("id, slug, title, category, starts_at, ends_at, location, cover_url, show_in_nav, sort_order")
-    .eq("kind", "evento")
+    .select("id, kind, slug, title, category, starts_at, ends_at, location, cover_url, show_in_nav, sort_order")
+    .eq("kind", kind)
     .order("sort_order", { ascending: true })
     .order("starts_at", { ascending: true, nullsFirst: false });
   return (data ?? []) as EventSummary[];
 });
 
-export const getNavEvents = cache(async () => {
+/** Itens dos submenus automáticos: { eventos: [...], cortejos: [...], capacitacoes: [...] }. */
+export const getNavPages = cache(async () => {
   const { data } = await supabase()
     .from("pages")
-    .select("slug, title")
-    .eq("kind", "evento")
+    .select("slug, title, kind")
+    .in("kind", AREA_KINDS)
     .eq("show_in_nav", true)
     .order("sort_order", { ascending: true });
-  return (data ?? []) as { slug: string; title: string }[];
+  const out: Record<string, { slug: string; title: string; href: string }[]> = {};
+  for (const k of AREA_KINDS) out[AREAS[k].nav] = [];
+  for (const p of (data ?? []) as { slug: string; title: string; kind: AreaKind }[]) {
+    out[AREAS[p.kind].nav].push({ slug: p.slug, title: p.title, href: `/${AREAS[p.kind].path}/${p.slug}` });
+  }
+  return out;
 });
 
 export interface PublicPage {
   id: string;
-  kind: "home" | "evento" | "institucional";
+  kind: PageKind;
   slug: string;
   title: string;
   category: string | null;
@@ -52,7 +59,7 @@ export const getHome = cache(async (): Promise<PublicPage | null> => {
   return data ? { ...data, content: normalizeContent(data.content) } : null;
 });
 
-export const getPageBySlug = cache(async (slug: string): Promise<PublicPage | null> => {
-  const { data } = await supabase().from("pages").select(FIELDS).eq("slug", slug).neq("kind", "home").maybeSingle();
+export const getPageBySlug = cache(async (slug: string, kinds: PageKind[] = ["evento", "institucional"]): Promise<PublicPage | null> => {
+  const { data } = await supabase().from("pages").select(FIELDS).eq("slug", slug).in("kind", kinds).maybeSingle();
   return data ? { ...data, content: normalizeContent(data.content) } : null;
 });

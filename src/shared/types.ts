@@ -2,7 +2,9 @@
 // Mantenha as cópias em FestivalPrimaveraCultura/src/shared e ADM-FestivalPrimaveraCultura/src/shared iguais.
 
 export type AppRole = "admin" | "editor";
-export type PageKind = "home" | "evento" | "institucional";
+export type PageKind = "home" | "evento" | "cortejo" | "capacitacao" | "institucional";
+/** Áreas com listagem própria no site (mesma dinâmica de "Eventos"). */
+export type AreaKind = "evento" | "cortejo" | "capacitacao";
 export type PageStatus = "draft" | "published" | "scheduled";
 export type SubmissionStatus = "novo" | "contatado" | "confirmado" | "descartado";
 
@@ -79,6 +81,8 @@ export interface FaqProps {
 export interface NewsItem { title: string; subtitle?: string; image?: string; url: string; source?: string; date?: string }
 /** Inscrição no evento da página (login + confirmação por e-mail + Google Agenda). */
 export interface RegistrationProps { title?: string; intro?: string; buttonLabel?: string }
+/** Inscrição em capacitação sem login: nome, e-mail e telefone, com confirmação por e-mail. */
+export interface TrainingFormProps { title?: string; intro?: string; buttonLabel?: string; successMessage?: string }
 /** Notícias: só título, subtítulo e imagem; o clique leva ao link externo da matéria. */
 export interface NewsProps { items: NewsItem[]; columns: 2 | 3; featured?: boolean }
 export interface LogosProps { title?: string; items: { url: string; name?: string; link?: string }[]; grayscale?: boolean }
@@ -100,6 +104,7 @@ export type BlockMap = {
   faq: FaqProps;
   news: NewsProps;
   registration: RegistrationProps;
+  training: TrainingFormProps;
   logos: LogosProps;
   spacer: SpacerProps;
   divider: DividerProps;
@@ -129,7 +134,7 @@ export interface Theme {
   fontHeadingUrl?: string; // arquivo enviado (.woff2)
   fontBodyUrl?: string;
 }
-export interface NavItem { label: string; href: string; visible: boolean; auto?: "eventos" }
+export interface NavItem { label: string; href: string; visible: boolean; auto?: "eventos" | "cortejos" | "capacitacoes" }
 export interface SiteSettings {
   festival_name: string;
   tagline: string | null;
@@ -147,6 +152,7 @@ export interface SiteSettings {
 
 export interface EventSummary {
   id: string;
+  kind?: PageKind;
   slug: string;
   title: string;
   category: string | null;

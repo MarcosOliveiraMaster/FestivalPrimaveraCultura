@@ -4,10 +4,10 @@ import type { NavItem } from "@/shared/types";
 import { BrandIcon } from "@/shared/render/BrandIcon";
 import { FramedImage } from "@/shared/render/FramedImage";
 
-export function SiteHeader({ name, logo, logoLight, icon, nav, events, account }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; events: { slug: string; title: string }[]; account?: string | null }) {
+export function SiteHeader({ name, logo, logoLight, icon, nav, menus, account }: { name: string; logo?: string; logoLight?: string; icon?: string; nav: NavItem[]; menus: Record<string, { slug: string; title: string; href: string }[]>; account?: string | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [drop, setDrop] = useState(false);
+  const [drop, setDrop] = useState<string | null>(null);
   const [transparent, setTransparent] = useState(false);
   useEffect(() => {
     // Transparente só quando a página começa com uma seção de fundo escuro
@@ -21,7 +21,8 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events, account }
     return () => window.removeEventListener("scroll", on);
   }, []);
   const solid = !transparent || scrolled || open;
-  const items = nav.filter((n) => n.visible);
+  // Áreas automáticas sem nenhuma página publicada não aparecem no menu.
+  const items = nav.filter((n) => n.visible && (!n.auto || n.auto === "eventos" || (menus[n.auto]?.length ?? 0) > 0));
   const logoSrc = solid ? logo : logoLight || logo;
 
   return (
@@ -40,20 +41,20 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events, account }
         </a>
         <nav className="hidden items-center gap-1 md:flex">
           {items.map((n) =>
-            n.auto === "eventos" ? (
-              <div key={n.label} className="relative" onMouseEnter={() => setDrop(true)} onMouseLeave={() => setDrop(false)}>
-                <a href={n.href} className="flex items-center gap-1 rounded-full px-4 py-2 font-medium hover:bg-black/5" onFocus={() => setDrop(true)}>
+            n.auto ? (
+              <div key={n.label} className="relative" onMouseEnter={() => setDrop(n.auto!)} onMouseLeave={() => setDrop(null)}>
+                <a href={n.href} className="flex items-center gap-1 rounded-full px-4 py-2 font-medium hover:bg-black/5" onFocus={() => setDrop(n.auto!)}>
                   {n.label} <span aria-hidden className="text-xs">▾</span>
                 </a>
-                {drop && events.length > 0 && (
+                {drop === n.auto && (menus[n.auto]?.length ?? 0) > 0 && (
                   <div className="absolute right-0 top-full w-64 pt-2">
                     <div className="overflow-hidden rounded-2xl bg-white py-2 text-[var(--fp-text)] shadow-xl ring-1 ring-black/5">
-                      {events.map((e) => (
-                        <a key={e.slug} href={`/eventos/${e.slug}`} data-track={`menu-evento:${e.slug}`} className="block px-4 py-2 hover:bg-black/5">
+                      {menus[n.auto].map((e) => (
+                        <a key={e.href} href={e.href} data-track={`menu-${n.auto}:${e.slug}`} className="block px-4 py-2 hover:bg-black/5">
                           {e.title}
                         </a>
                       ))}
-                      <a href="/eventos" className="mt-1 block border-t border-black/5 px-4 py-2 text-sm font-semibold text-[var(--fp-primary)]">Ver todos →</a>
+                      <a href={n.href} className="mt-1 block border-t border-black/5 px-4 py-2 text-sm font-semibold text-[var(--fp-primary)]">Ver todos →</a>
                     </div>
                   </div>
                 )}
@@ -79,9 +80,9 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, events, account }
           {items.map((n) => (
             <div key={n.label}>
               <a href={n.href} onClick={() => setOpen(false)} className="block py-3 text-lg font-medium">{n.label}</a>
-              {n.auto === "eventos" &&
-                events.map((e) => (
-                  <a key={e.slug} href={`/eventos/${e.slug}`} onClick={() => setOpen(false)} className="block py-2 pl-4 opacity-80">
+              {n.auto &&
+                (menus[n.auto] ?? []).map((e) => (
+                  <a key={e.href} href={e.href} onClick={() => setOpen(false)} className="block py-2 pl-4 opacity-80">
                     {e.title}
                   </a>
                 ))}
