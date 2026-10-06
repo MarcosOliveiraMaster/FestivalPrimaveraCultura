@@ -11,7 +11,11 @@ export type SubmissionStatus = "novo" | "contatado" | "confirmado" | "descartado
 export type SectionLayout = "1" | "1-1" | "1-2" | "2-1" | "1-1-1" | "1-1-1-1";
 
 export interface SectionStyle {
-  bgType: "none" | "color" | "gradient" | "image" | "video";
+  bgType: "none" | "color" | "gradient" | "image" | "video" | "carousel";
+  /** Imagens do carrossel (fundo "carousel"), exibidas em sequência. */
+  bgImages?: string[];
+  /** Segundos por imagem no carrossel (padrão 6). */
+  bgInterval?: number;
   bgColor?: string;
   bgColor2?: string;
   bgUrl?: string;
