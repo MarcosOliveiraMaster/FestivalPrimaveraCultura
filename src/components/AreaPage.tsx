@@ -7,6 +7,7 @@ import { currentTime, formatRange } from "@/shared/format";
 import { cleanSrc } from "@/shared/image";
 import { getViewer } from "@/lib/supabase-server";
 import type { PageKind } from "@/shared/types";
+import { withTrainingForm } from "@/shared/blocks";
 
 /** Metadados (SEO) de uma página de área. */
 export async function areaMetadata(slug: string, kinds: PageKind[]): Promise<Metadata> {
@@ -24,16 +25,19 @@ export async function areaMetadata(slug: string, kinds: PageKind[]): Promise<Met
 export async function AreaPage({ slug, kinds }: { slug: string; kinds: PageKind[] }) {
   const [page, settings, events, viewer] = await Promise.all([getPageBySlug(slug, kinds), getSettings(), getEvents(), getViewer()]);
   if (!page) notFound();
+  const content = page.kind === "capacitacao" ? withTrainingForm(page.content) : page.content;
+  const intro = page.content.sections.length === 0;
   return (
     <>
-      {page.content.sections.length === 0 ? (
-        <div className="mx-auto max-w-3xl px-5 pb-20 pt-16">
+      {intro && (
+        <div className="mx-auto max-w-3xl px-5 pt-16">
           <h1 className="fp-heading fp-h1">{page.title}</h1>
-          <p className="mt-4 opacity-70">Conteúdo em breve.</p>
+          {content.sections.length === 0 && <p className="mt-4 pb-20 opacity-70">Conteúdo em breve.</p>}
         </div>
-      ) : (
+      )}
+      {content.sections.length > 0 && (
         <PageRenderer
-          content={page.content}
+          content={content}
           ctx={{ mode: "public", pageId: page.id, settings, events, now: currentTime(), viewer: { loggedIn: !!viewer.user }, page: { title: page.title, starts_at: page.starts_at, ends_at: page.ends_at, location: page.location, color: page.color } }}
         />
       )}
