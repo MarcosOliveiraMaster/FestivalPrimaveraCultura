@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "../shared/festival.css";
+
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { background: var(--fp-bg); color: var(--fp-text); font-family: var(--fp-font-body); }
+
+/* Espaço para o cabeçalho fixo, exceto quando a página começa com uma capa escura */
+main { padding-top: 4rem; }
+main:has(> .fp-page > section:first-child.fp-on-dark) { padding-top: 0; }
+
+/* Login do participante */
+.fp-login-google { background: #fff; color: #1f1f1f; border: 1px solid #dadce0; width: 100%; }
+.fp-login-or { display: flex; align-items: center; gap: .75rem; font-size: .85rem; opacity: .6; }
+.fp-login-or::before, .fp-login-or::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .3; }
+.fp-login-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgb(0 0 0 / .05); }
+.fp-login-tabs button { flex: 1; border-radius: 999px; padding: .5rem; font-weight: 600; }
+.fp-login-tabs button[aria-selected="true"] { background: #fff; box-shadow: 0 2px 8px rgb(0 0 0 / .1); color: var(--fp-primary); }
+
+/* Certificado (A4 paisagem) */
+.fp-cert { position: relative; overflow: hidden; margin: 0 auto; width: 100%; max-width: 297mm; aspect-ratio: 297 / 210; background: #fffdf7; color: #1f2421; box-shadow: 0 20px 50px -20px rgb(0 0 0 / .35); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; padding: 6% 9%; text-align: center; container-type: inline-size; }
+.fp-cert::before { content: ""; position: absolute; inset: 3%; border: 2px solid var(--fp-primary); border-radius: 1.5rem; pointer-events: none; }
+.fp-cert-title { font-size: clamp(2rem, 7cqi, 4rem); }
+.fp-cert-name { font-size: clamp(1.5rem, 4.6cqi, 2.6rem); color: var(--fp-primary); }
+.fp-cert-text { max-width: 70ch; font-size: clamp(.95rem, 1.9cqi, 1.2rem); line-height: 1.7; }
+.fp-cert-foot { margin-top: 4%; display: flex; width: 100%; justify-content: space-between; align-items: flex-end; gap: 1rem; font-size: clamp(.7rem, 1.3cqi, .85rem); opacity: .8; }
+.fp-cert-sign { border-top: 1px solid currentColor; padding-top: .4rem; min-width: 30%; }
+.fp-cert-wave { position: absolute; left: 0; right: 0; bottom: 0; height: 9%; background: var(--fp-primary); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30 Q150 0 300 30 T600 30 T900 30 T1200 30 V60 H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100%; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30 Q150 0 300 30 T600 30 T900 30 T1200 30 V60 H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100%; }
+.fp-cert-wave-top { top: 0; bottom: auto; transform: scaleY(-1); }
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body > header, body > footer, .fp-no-print { display: none !important; }
+  .fp-cert-wrap { padding: 0 !important; background: #fff; }
+  .fp-cert { box-shadow: none; max-width: none; width: 297mm; height: 210mm; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
