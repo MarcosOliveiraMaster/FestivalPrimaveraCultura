@@ -65,9 +65,12 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, menus, account }:
               </a>
             ),
           )}
-          <a href={account ? "/minha-conta" : "/entrar"} data-track="menu:conta" className={`ml-2 rounded-full px-4 py-2 font-semibold ${solid ? "bg-[var(--fp-primary)] text-white" : "bg-white/15 ring-1 ring-white/40"}`}>
-            {account ? `Olá, ${account}` : "Entrar"}
-          </a>
+          {/* Sem botão "Entrar" no menu: a equipe acessa pelo endereço do painel (adm.…). Quem já está logado vê "Minha conta". */}
+          {account && (
+            <a href="/minha-conta" data-track="menu:conta" className={`ml-2 rounded-full px-4 py-2 font-semibold ${solid ? "bg-[var(--fp-primary)] text-white" : "bg-white/15 ring-1 ring-white/40"}`}>
+              Olá, {account}
+            </a>
+          )}
         </nav>
         <button type="button" className="md:hidden" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -88,9 +91,11 @@ export function SiteHeader({ name, logo, logoLight, icon, nav, menus, account }:
                 ))}
             </div>
           ))}
-          <a href={account ? "/minha-conta" : "/entrar"} onClick={() => setOpen(false)} className="mt-2 block py-3 text-lg font-semibold text-[var(--fp-primary)]">
-            {account ? "Minha conta" : "Entrar / criar conta"}
-          </a>
+          {account && (
+            <a href="/minha-conta" onClick={() => setOpen(false)} className="mt-2 block py-3 text-lg font-semibold text-[var(--fp-primary)]">
+              Minha conta
+            </a>
+          )}
         </nav>
       )}
     </header>
