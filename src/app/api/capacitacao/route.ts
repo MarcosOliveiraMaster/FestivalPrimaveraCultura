@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { clientIp, str, UUID } from "@/lib/request";
+import { isValidCpf } from "@/shared/certificate";
 
 const hits = new Map<string, number[]>();
 function limited(ip: string) {
@@ -11,7 +12,7 @@ function limited(ip: string) {
   return list.length > 5;
 }
 
-/** Inscrição em capacitação sem login. Vagas e inscrições abertas são conferidas no banco. */
+/** Inscrição sem login (eventos, cortejos e capacitações). Vagas e inscrições abertas são conferidas no banco. */
 export async function POST(req: NextRequest) {
   let b: Record<string, unknown>;
   try {
@@ -26,14 +27,16 @@ export async function POST(req: NextRequest) {
   const name = str(b.name, 200);
   const email = str(b.email, 320)?.toLowerCase() ?? null;
   const phone = str(b.phone, 40);
-  if (!pageId) return NextResponse.json({ error: "Capacitação inválida." }, { status: 400 });
+  const cpf = typeof b.cpf === "string" ? b.cpf.replace(/\D/g, "") : "";
+  if (!pageId) return NextResponse.json({ error: "Página inválida." }, { status: 400 });
   if (!name || name.length < 2) return NextResponse.json({ error: "Informe seu nome." }, { status: 400 });
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Informe um e-mail válido." }, { status: 400 });
   if (!phone || phone.replace(/\D/g, "").length < 10) return NextResponse.json({ error: "Informe um telefone com DDD." }, { status: 400 });
+  if (cpf && !isValidCpf(cpf)) return NextResponse.json({ error: "CPF inválido." }, { status: 400 });
   if (b.consent !== true) return NextResponse.json({ error: "É preciso aceitar o uso dos dados (LGPD)." }, { status: 400 });
 
   const db = supabase();
-  const { data: id, error } = await db.rpc("register_training", { p_page: pageId, p_name: name, p_email: email, p_phone: phone });
+  const { data: id, error } = await db.rpc("register_training", { p_page: pageId, p_name: name, p_email: email, p_phone: phone, p_cpf: cpf || null });
   if (error) {
     if (error.code === "P0001" || error.code === "P0002") return NextResponse.json({ error: error.message }, { status: 400 });
     console.error("register_training", error);
