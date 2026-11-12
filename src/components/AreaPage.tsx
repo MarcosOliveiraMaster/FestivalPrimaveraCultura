@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getEvents, getPageBySlug, getSettings } from "@/lib/data";
 import { PageRenderer } from "@/shared/render/PageRenderer";
 import { Tracker } from "@/components/Tracker";
@@ -8,6 +8,7 @@ import { cleanSrc } from "@/shared/image";
 import { getViewer } from "@/lib/supabase-server";
 import type { PageKind } from "@/shared/types";
 import { withTrainingForm } from "@/shared/blocks";
+import { pagePath } from "@/shared/areas";
 
 /** Metadados (SEO) de uma página de área. */
 export async function areaMetadata(slug: string, kinds: PageKind[]): Promise<Metadata> {
@@ -24,7 +25,12 @@ export async function areaMetadata(slug: string, kinds: PageKind[]): Promise<Met
 /** Página de um evento, cortejo ou capacitação (mesma dinâmica para as três áreas). */
 export async function AreaPage({ slug, kinds }: { slug: string; kinds: PageKind[] }) {
   const [page, settings, events, viewer] = await Promise.all([getPageBySlug(slug, kinds), getSettings(), getEvents(), getViewer()]);
-  if (!page) notFound();
+  if (!page) {
+    // A página mudou de tipo (ex.: evento → capacitação): o link antigo leva ao endereço novo.
+    const moved = await getPageBySlug(slug, ["evento", "cortejo", "capacitacao", "institucional"]);
+    if (moved) permanentRedirect(pagePath(moved));
+    notFound();
+  }
   const content = page.kind === "capacitacao" ? withTrainingForm(page.content) : page.content;
   const intro = page.content.sections.length === 0;
   return (
