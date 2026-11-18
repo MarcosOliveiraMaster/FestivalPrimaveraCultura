@@ -63,3 +63,9 @@ export const getPageBySlug = cache(async (slug: string, kinds: PageKind[] = ["ev
   const { data } = await supabase().from("pages").select(FIELDS).eq("slug", slug).in("kind", kinds).maybeSingle();
   return data ? { ...data, content: normalizeContent(data.content) } : null;
 });
+
+/** Página de outra área com o mesmo endereço (ex.: um evento que virou capacitação), para redirecionar links antigos. */
+export const findMovedPage = cache(async (slug: string, exclude: PageKind[]): Promise<{ kind: PageKind; slug: string } | null> => {
+  const { data } = await supabase().from("pages").select("kind, slug").eq("slug", slug).neq("kind", "home").limit(1).maybeSingle();
+  return data && !exclude.includes(data.kind) ? data : null;
+});

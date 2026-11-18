@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { getEvents, getPageBySlug, getSettings } from "@/lib/data";
+import { notFound, permanentRedirect } from "next/navigation";
+import { findMovedPage, getEvents, getPageBySlug, getSettings } from "@/lib/data";
+import { pagePath } from "@/shared/areas";
 import { PageRenderer } from "@/shared/render/PageRenderer";
 import { Tracker } from "@/components/Tracker";
 import { currentTime, formatRange } from "@/shared/format";
@@ -24,7 +25,12 @@ export async function areaMetadata(slug: string, kinds: PageKind[]): Promise<Met
 /** Página de um evento, cortejo ou capacitação (mesma dinâmica para as três áreas). */
 export async function AreaPage({ slug, kinds }: { slug: string; kinds: PageKind[] }) {
   const [page, settings, events, viewer] = await Promise.all([getPageBySlug(slug, kinds), getSettings(), getEvents(), getViewer()]);
-  if (!page) notFound();
+  if (!page) {
+    // Página que mudou de área (ex.: evento → capacitação): leva o link antigo ao endereço novo.
+    const moved = await findMovedPage(slug, kinds);
+    if (moved) permanentRedirect(pagePath(moved));
+    notFound();
+  }
   const content = page.kind === "capacitacao" ? withTrainingForm(page.content) : page.content;
   const intro = page.content.sections.length === 0;
   return (
